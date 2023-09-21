@@ -3,7 +3,11 @@
 import "@mantine/core/styles.css";
 
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction } from "@remix-run/node";
+import {
+  json,
+  type LinksFunction,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -13,10 +17,15 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
+import { getUser } from "~/session.server";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  return json({ user: await getUser(request) });
+};
 
 export default function App() {
   return (
