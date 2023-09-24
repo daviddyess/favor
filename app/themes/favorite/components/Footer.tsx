@@ -1,17 +1,17 @@
-import { Anchor, Group, ActionIcon, rem } from "@mantine/core";
+import { Anchor, Group, ActionIcon, rem } from '@mantine/core';
 import {
   IconBrandTwitter,
   IconBrandYoutube,
-  IconBrandInstagram,
-} from "@tabler/icons-react";
-import classes from "~/themes/favorite/styles/Footer.module.css";
+  IconBrandInstagram
+} from '@tabler/icons-react';
+import classes from '~/themes/favorite/styles/Footer.module.css';
 
 const links = [
-  { link: "#", label: "Contact" },
-  { link: "#", label: "Privacy" },
-  { link: "#", label: "Blog" },
-  { link: "#", label: "Store" },
-  { link: "#", label: "Careers" },
+  { link: '#', label: 'Contact' },
+  { link: '#', label: 'Privacy' },
+  { link: '#', label: 'Blog' },
+  { link: '#', label: 'Store' },
+  { link: '#', label: 'Careers' }
 ];
 
 export function Footer() {
