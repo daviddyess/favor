@@ -6,7 +6,7 @@
     "build": "remix build",
     "dev": "remix dev --manual",
     "migrate": "node migrate.mjs",
-    "start": "remix-serve ./build/index.js",
+    "start": "npm run migrate && remix-serve ./build/index.js",
     "typecheck": "tsc"
   },
   "dependencies": {
