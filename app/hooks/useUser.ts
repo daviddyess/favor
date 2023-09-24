@@ -1,5 +1,5 @@
 import useMatchesData from '~/hooks/useMatchesData';
-import type { User } from '#/User';
+import type { User } from '~/interfaces/User';
 
 function isUser(user: any): user is User {
   return user && typeof user === 'object' && typeof user.id === 'string';

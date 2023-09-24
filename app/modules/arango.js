@@ -1,5 +1,5 @@
-import { Database, aql as template } from 'arangojs';
-import { db as DB } from './config';
+import { Database, aql as template } from "arangojs";
+import { db as DB } from "./config.server";
 
 export const db = new Database(DB);
 export const aql = template;
@@ -18,5 +18,5 @@ export const findUnique = async ({ col, field, value }) => {
 export default {
   db,
   aql,
-  findUnique
+  findUnique,
 };

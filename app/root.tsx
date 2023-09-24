@@ -1,26 +1,27 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
-import "@mantine/core/styles.css";
+import '@mantine/core/styles.css';
 
-import { cssBundleHref } from "@remix-run/css-bundle";
+import { cssBundleHref } from '@remix-run/css-bundle';
 import {
   json,
   type LinksFunction,
-  type LoaderFunctionArgs,
-} from "@remix-run/node";
+  type LoaderFunctionArgs
+} from '@remix-run/node';
 import {
   Links,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration,
-} from "@remix-run/react";
-import { MantineProvider, ColorSchemeScript } from "@mantine/core";
-import { getUser } from "~/session.server";
+  ScrollRestoration
+} from '@remix-run/react';
+import { MantineProvider, ColorSchemeScript } from '@mantine/core';
+import { getUser } from '~/session.server';
+import { ThemeProvider } from '~/theme';
 
 export const links: LinksFunction = () => [
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : [])
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -39,10 +40,12 @@ export default function App() {
       </head>
       <body>
         <MantineProvider>
-          <Outlet />
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
+          <ThemeProvider>
+            <Outlet />
+            <ScrollRestoration />
+            <Scripts />
+            <LiveReload />
+          </ThemeProvider>
         </MantineProvider>
       </body>
     </html>

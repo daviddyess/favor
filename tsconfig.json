@@ -13,6 +13,7 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
+      "@/favor": ["favor.js", "./favor.default.js"],
       "~/*": ["./app/*"]
     },
 
