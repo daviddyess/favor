@@ -1,5 +1,5 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
-import config from "~/modules/config";
+import config from "~/modules/config.server";
 import type { User } from "~/interfaces/User";
 import { getUserById } from "~/models/user.server";
 

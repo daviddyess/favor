@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { getLogger } from "logade";
-import { avatarURL } from "~/modules/config";
+import { avatarURL } from "~/modules/config.server";
 import { aql, db } from "~/modules/arango";
 import type { User, UserLogin } from "~/interfaces/User";
 

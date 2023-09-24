@@ -63,6 +63,8 @@ export const session = {
   secure: true,
 };
 
+export const theme = process.env.THEME;
+
 export default {
   session,
   aws,
@@ -72,4 +74,5 @@ export default {
   s3Providers,
   storageURL,
   avatarURL,
+  theme,
 };

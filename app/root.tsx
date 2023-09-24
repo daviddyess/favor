@@ -18,7 +18,7 @@ import {
 } from "@remix-run/react";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { getUser } from "~/session.server";
-import { Theme } from "~/theme";
+import { ThemeProvider } from "~/theme";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -40,12 +40,12 @@ export default function App() {
       </head>
       <body>
         <MantineProvider>
-          <Theme>
+          <ThemeProvider>
             <Outlet />
-          </Theme>
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
+            <ScrollRestoration />
+            <Scripts />
+            <LiveReload />
+          </ThemeProvider>
         </MantineProvider>
       </body>
     </html>

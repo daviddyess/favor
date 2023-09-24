@@ -13,3 +13,9 @@ export function Page({ children }: { children: ReactNode }) {
     </>
   );
 }
+
+export const Theme = {
+  Page,
+};
+
+export default Page;
