@@ -1,7 +1,6 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
 import '@mantine/core/styles.css';
-
 import { cssBundleHref } from '@remix-run/css-bundle';
 import {
   json,
@@ -39,7 +38,7 @@ export default function App() {
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>
+        <MantineProvider defaultColorScheme="auto">
           <ThemeProvider>
             <Outlet />
             <ScrollRestoration />
