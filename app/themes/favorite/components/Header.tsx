@@ -1,32 +1,48 @@
 import {
-  HoverCard,
-  Group,
-  Button,
-  UnstyledButton,
-  Text,
-  SimpleGrid,
-  ThemeIcon,
   Anchor,
-  Divider,
-  Center,
+  Avatar,
   Box,
   Burger,
-  Drawer,
+  Button,
+  Center,
   Collapse,
-  ScrollArea,
+  Divider,
+  Drawer,
+  Group,
+  HoverCard,
+  Menu,
   rem,
+  ScrollArea,
+  SimpleGrid,
+  Text,
+  ThemeIcon,
+  UnstyledButton,
   useMantineTheme
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { Link, useNavigate } from '@remix-run/react';
 import {
-  IconNotification,
-  IconCode,
   IconBook,
   IconChartPie3,
-  IconFingerprint,
+  IconChevronDown,
+  IconCode,
   IconCoin,
-  IconChevronDown
+  IconFingerprint,
+  IconNotification,
+  IconFriends,
+  IconHeart,
+  IconLogin,
+  IconLogout,
+  IconMessage,
+  IconSettings,
+  IconStar,
+  IconSwitchHorizontal,
+  IconUserPlus
 } from '@tabler/icons-react';
+import cx from 'clsx';
+import { useState } from 'react';
+import { site } from '@/favor';
+import useUser from '~/hooks/useUser';
 import classes from '~/themes/favorite/styles/Header.module.css';
 
 const mockdata = [
@@ -63,9 +79,14 @@ const mockdata = [
 ];
 
 export function Header() {
+  const navigate = useNavigate();
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
+  const [userMenuOpened, setUserMenuOpened] = useState(false);
+  const user = useUser();
+  const isLoggedIn = user?.isLoggedIn ?? false;
+  const username = user?.username ?? 'Guest';
   const theme = useMantineTheme();
 
   const links = mockdata.map((item) => (
@@ -90,14 +111,24 @@ export function Header() {
   ));
 
   return (
-    <Box pb={120}>
+    <Box pb={20}>
       <header className={classes.header}>
         <Group justify="space-between" h="100%">
-          Site Name
+          <Anchor component={Link} to="/" underline="never">
+            <Text
+              gradient={{ from: 'indigo', to: 'blue', deg: 90 }}
+              fw={500}
+              size="xl"
+              variant="gradient"
+            >
+              {site?.name ?? 'Site Name'}
+            </Text>
+          </Anchor>
+
           <Group h="100%" gap={0} visibleFrom="sm">
-            <a href="#" className={classes.link}>
+            <Link to="/" className={classes.link}>
               Home
-            </a>
+            </Link>
             <HoverCard
               width={600}
               position="bottom"
@@ -155,10 +186,122 @@ export function Header() {
               Academy
             </a>
           </Group>
-          <Group visibleFrom="sm">
-            <Button variant="default">Log in</Button>
-            <Button>Sign up</Button>
-          </Group>
+          <Menu
+            width={260}
+            position="bottom-end"
+            transitionProps={{ transition: 'pop-top-right' }}
+            onClose={() => setUserMenuOpened(false)}
+            onOpen={() => setUserMenuOpened(true)}
+            withinPortal
+          >
+            <Menu.Target>
+              <UnstyledButton
+                className={cx(classes.user, {
+                  [classes.userActive]: userMenuOpened
+                })}
+              >
+                <Group gap={7}>
+                  <Avatar
+                    src={user?.avatar?.sm}
+                    alt={username}
+                    radius="xl"
+                    size={30}
+                  />
+                  <Text fw={500} size="sm" style={{ lineHeight: 1 }} mr={3}>
+                    {username}
+                  </Text>
+                  <IconChevronDown size={12} stroke={1.5} />
+                </Group>
+              </UnstyledButton>
+            </Menu.Target>
+            <Menu.Dropdown>
+              {isLoggedIn ? (
+                <>
+                  <Menu.Item
+                    leftSection={
+                      <IconHeart
+                        size={14}
+                        color={theme.colors.red[6]}
+                        stroke={1.5}
+                      />
+                    }
+                  >
+                    Liked posts
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={
+                      <IconStar
+                        size={14}
+                        color={theme.colors.yellow[6]}
+                        stroke={1.5}
+                      />
+                    }
+                  >
+                    Saved posts
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={
+                      <IconMessage
+                        size={14}
+                        color={theme.colors.blue[6]}
+                        stroke={1.5}
+                      />
+                    }
+                  >
+                    Your comments
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={
+                      <IconFriends color="green" size={14} stroke={1.5} />
+                    }
+                    onClick={() => navigate('/connections')}
+                  >
+                    My Connections
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Label>Theme</Menu.Label>
+
+                  <Menu.Divider />
+                  <Menu.Label>Settings</Menu.Label>
+                  <Menu.Item
+                    leftSection={<IconSettings size={14} stroke={1.5} />}
+                    onClick={() => navigate('/account')}
+                  >
+                    Account settings
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={
+                      <IconSwitchHorizontal size={14} stroke={1.5} />
+                    }
+                  >
+                    Change account
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconLogout size={14} stroke={1.5} />}
+                    onClick={() => navigate('/logout')}
+                  >
+                    Logout
+                  </Menu.Item>
+                </>
+              ) : (
+                <>
+                  <Menu.Item
+                    leftSection={<IconLogin size={14} stroke={1.5} />}
+                    onClick={() => navigate('/login')}
+                  >
+                    Login
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Item
+                    leftSection={<IconUserPlus size={14} stroke={1.5} />}
+                    onClick={() => navigate('/register')}
+                  >
+                    Register
+                  </Menu.Item>
+                </>
+              )}
+            </Menu.Dropdown>
+          </Menu>
           <Burger
             opened={drawerOpened}
             onClick={toggleDrawer}

@@ -1,9 +1,10 @@
-import { Anchor, Group, ActionIcon, rem } from '@mantine/core';
+import { Anchor, Group, ActionIcon, rem, Text } from '@mantine/core';
 import {
   IconBrandTwitter,
   IconBrandYoutube,
   IconBrandInstagram
 } from '@tabler/icons-react';
+import { site } from '@/favor';
 import classes from '~/themes/favorite/styles/Footer.module.css';
 
 const links = [
@@ -31,7 +32,9 @@ export function Footer() {
   return (
     <div className={classes.footer}>
       <div className={classes.inner}>
-        Site Name
+        <Text fw={500} size="md">
+          {site?.name ?? 'Site Name'}
+        </Text>
         <Group className={classes.links}>{items}</Group>
         <Group gap="xs" justify="flex-end" wrap="nowrap">
           <ActionIcon size="lg" variant="default" radius="xl">
