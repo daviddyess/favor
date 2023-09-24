@@ -1,9 +1,9 @@
-import { randomUUID } from "crypto";
-import { getLogger } from "logade";
-import md5 from "md5";
-import { sanitize } from "string-sanitizer";
+import { randomUUID } from 'crypto';
+import { getLogger } from 'logade';
+import md5 from 'md5';
+import { sanitize } from '~/modules/stringSanitizer';
 
-const log = getLogger("Utils Module");
+const log = getLogger('Utils Module');
 /**
  * AWS Storage URL
  */
@@ -17,7 +17,7 @@ export const awsServer = `https://${process.env.AWS_S3_BUCKET}.s3-${process.env.
 export function getIpAddress(req) {
   try {
     return (
-      (req.headers?.["x-forwarded-for"] || "").split(",").pop().trim() ||
+      (req.headers?.['x-forwarded-for'] || '').split(',').pop().trim() ||
       req?.socket?.remoteAddress
     );
   } catch (err) {
@@ -33,7 +33,7 @@ export function getIpAddress(req) {
  */
 export function getRequestIdentifier(req) {
   try {
-    return md5(`${getIpAddress(req)} + ${req?.headers?.["user-agent"]}`);
+    return md5(`${getIpAddress(req)} + ${req?.headers?.['user-agent']}`);
   } catch (err) {
     log.error(err.message);
     log.error(err.stack);
@@ -79,15 +79,15 @@ export const futureTime = ({ hours }) => {
  */
 export const randomNumber = (length, str = false) => {
   try {
-    let min = "1";
+    let min = '1';
 
-    let max = "9";
+    let max = '9';
 
     let i = 1;
 
     while (i < length) {
-      min += "0";
-      max += "0";
+      min += '0';
+      max += '0';
       i++;
     }
     const rand = Math.floor(Number(min) + Math.random() * Number(max));
@@ -110,18 +110,18 @@ export const randomNumber = (length, str = false) => {
  * @returns string
  */
 export const formatSlug = ({
-  format = "title",
+  format = 'title',
   date = timeStamp(),
-  divider = "addDash",
+  divider = 'addDash',
   id = null,
   lowerCase = true,
-  space = "addUnderscore",
-  title = sanitize[space]("no title"),
+  space = 'addUnderscore',
+  title = sanitize[space]('no title')
 }) => {
   try {
     let url, year, monthDate, dateDate, mmDate, ddDate;
 
-    if (format === "date-id" || format === "date-title") {
+    if (format === 'date-id' || format === 'date-title') {
       const dateObject = new Date(date);
 
       year = dateObject.getFullYear();
@@ -132,24 +132,24 @@ export const formatSlug = ({
     }
 
     switch (format) {
-      case "date-id":
+      case 'date-id':
         url = sanitize[divider](`${year} ${mmDate}$ ${ddDate} `) + `${id}`;
         break;
-      case "date-title":
+      case 'date-title':
         url =
           sanitize[divider](`${year} ${mmDate} ${ddDate} `) +
           sanitize[space](title);
         break;
-      case "id":
+      case 'id':
         url = `${id}`;
         break;
-      case "id-title":
+      case 'id-title':
         url = sanitize[divider](`${id} `) + sanitize[space](title);
         break;
-      case "title":
+      case 'title':
         url = sanitize[space](title);
         break;
-      case "title-id":
+      case 'title-id':
         url = sanitize[space](title) + sanitize[divider](` ${id}`);
         break;
       default:
@@ -176,5 +176,5 @@ export const uuid = () => {
  * @returns string
  */
 export const stripTags = (value) => {
-  return value.replace(/(<([^>]+)>)/gi, "");
+  return value.replace(/(<([^>]+)>)/gi, '');
 };
