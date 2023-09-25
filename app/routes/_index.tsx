@@ -1,15 +1,16 @@
-import type { MetaFunction } from "@remix-run/node";
+import { site } from '@/favor';
+import type { MetaFunction } from '@remix-run/node';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: `Home - ${site?.name ?? 'Site Name'}` },
+    { name: 'description', content: site?.description ?? 'Welcome to Remix!' }
   ];
 };
 
 export default function Index() {
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
+    <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.8' }}>
       <h1>Welcome to Remix</h1>
       <ul>
         <li>

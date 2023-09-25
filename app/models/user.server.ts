@@ -1,12 +1,52 @@
-import bcrypt from "bcrypt";
-import { getLogger } from "logade";
-import { avatarURL } from "~/modules/config.server";
-import { aql, db } from "~/modules/arango";
-import type { User, UserLogin } from "~/interfaces/User";
+import bcrypt from 'bcrypt';
+import { getLogger } from 'logade';
+import { avatarURL } from '~/modules/config.server';
+import { aql, db } from '~/modules/arango';
+import { timeStamp } from '~/modules/utils';
+import type { User, UserLogin, UserSystem } from '~/interfaces/User';
 
-const log = getLogger("User");
-const hasConnection = db.collection("hasConnection");
-const users = db.collection("users");
+const log = getLogger('User');
+const hasConnection = db.collection('hasConnection');
+const users = db.collection('users');
+
+export async function createUser({ username, email, password }: UserSystem) {
+  try {
+    const userCheckQ = await db.query(aql`
+      FOR u IN ${users}
+        FILTER u.username == ${username} OR u.email == ${email}
+        RETURN u
+    `);
+    const userCheck = await userCheckQ.all();
+
+    if (userCheck.length > 0) {
+      throw new Error('Username or Email already taken');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password as string, salt);
+
+    const user = await users.save(
+      {
+        username,
+        email,
+        password: hashedPassword,
+        createdAt: timeStamp(),
+        updatedAt: timeStamp()
+      },
+      {
+        returnNew: true
+      }
+    );
+
+    user.id = user._key;
+
+    return user;
+  } catch (err: any) {
+    log.error(err.message);
+    log.error(err.stack);
+    throw err;
+  }
+}
 
 export async function userLogin({ email, password }: UserLogin) {
   try {
@@ -19,12 +59,12 @@ export async function userLogin({ email, password }: UserLogin) {
     const login = await query.next();
 
     if (!login) {
-      throw new Error("Incorrect Username or Email");
+      throw new Error('Incorrect Username or Email');
     }
     const verification = await bcrypt.compare(password, login.password);
 
     if (!verification) {
-      throw new Error("Incorrect Password");
+      throw new Error('Incorrect Password');
     }
 
     login.id = login._key;
@@ -37,7 +77,7 @@ export async function userLogin({ email, password }: UserLogin) {
   }
 }
 
-export async function getUserById(id: User["id"]) {
+export async function getUserById(id: User['id']) {
   try {
     const query = await db.query(aql`
       FOR doc IN ${users}
@@ -48,7 +88,7 @@ export async function getUserById(id: User["id"]) {
     const user = await query.next();
 
     if (!user) {
-      throw new Error("User ID was not Found!");
+      throw new Error('User ID was not Found!');
     }
 
     user.id = user._key;
@@ -62,7 +102,7 @@ export async function getUserById(id: User["id"]) {
   }
 }
 
-export async function getUserAccount(id: User["id"]) {
+export async function getUserAccount(id: User['id']) {
   try {
     const query = await db.query(aql`
       FOR doc IN ${users}
@@ -77,7 +117,7 @@ export async function getUserAccount(id: User["id"]) {
     const userData = await query.next();
 
     if (!userData) {
-      throw new Error("User ID was not Found!");
+      throw new Error('User ID was not Found!');
     }
 
     const account = await userData.next();
@@ -87,8 +127,8 @@ export async function getUserAccount(id: User["id"]) {
       avatar: {
         sm: `${avatarURL}sm/${account?.avatar}`,
         md: `${avatarURL}md/${account?.avatar}`,
-        lg: `${avatarURL}lg/${account?.avatar}`,
-      },
+        lg: `${avatarURL}lg/${account?.avatar}`
+      }
     };
   } catch (err: any) {
     log.error(err.message);
@@ -100,7 +140,7 @@ export async function getUserAccount(id: User["id"]) {
 export async function getUser({
   id,
   username,
-  userId,
+  userId
 }: {
   id: string | undefined;
   username: string | undefined;
@@ -145,7 +185,7 @@ export async function getUser({
       );
       const user = await data.next();
 
-      user.connected = Boolean(user?.connection?.status === "Active");
+      user.connected = Boolean(user?.connection?.status === 'Active');
       user.avatar = `${avatarURL}md/${user?.avatar}`;
 
       return user;

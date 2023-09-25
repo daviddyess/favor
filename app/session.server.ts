@@ -1,9 +1,9 @@
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
-import config from "~/modules/config.server";
-import type { User } from "~/interfaces/User";
-import { getUserById } from "~/models/user.server";
+import { createCookieSessionStorage, redirect } from '@remix-run/node';
+import config from '~/modules/config.server';
+import type { User } from '~/interfaces/User';
+import { getUserById } from '~/models/user.server';
 
-const { name, maxAge, secrets } = config.session;
+const { name, maxAge, secrets, secure } = config.session;
 
 type SessionData = {
   userId: string | null;
@@ -25,19 +25,19 @@ const { getSession, commitSession, destroySession } =
   createCookieSessionStorage<SessionData, SessionFlashData>({
     // a Cookie from `createCookie` or the CookieOptions to create one
     cookie: {
-      name: name ?? "__session",
+      name: name ?? '__session',
       httpOnly: true,
-      maxAge: maxAge ?? 60,
-      path: "/",
-      sameSite: "lax",
-      secrets: secrets ?? ["s3cret1"],
-      secure: false,
-    },
+      maxAge,
+      path: '/',
+      sameSite: 'lax',
+      secrets: secrets ?? ['s3cret1'],
+      secure
+    }
   });
 
-export async function getUserId(request: Request): Promise<User["id"]> {
-  const session = await getSession(request.headers.get("Cookie"));
-  const userId = session.get("userId");
+export async function getUserId(request: Request): Promise<User['id']> {
+  const session = await getSession(request.headers.get('Cookie'));
+  const userId = session.get('userId');
   return userId;
 }
 
@@ -52,11 +52,11 @@ export async function getUser(request: Request) {
 }
 
 export async function logout(request: Request) {
-  const session = await getSession(request.headers.get("Cookie"));
-  return redirect("/", {
+  const session = await getSession(request.headers.get('Cookie'));
+  return redirect('/', {
     headers: {
-      "Set-Cookie": await sessionStorage.destroySession(session),
-    },
+      'Set-Cookie': await sessionStorage.destroySession(session)
+    }
   });
 }
 
