@@ -78,11 +78,40 @@ const mockdata = [
   }
 ];
 
+const userMenuData = [
+  {
+    icon: IconHeart,
+    title: 'Liked posts'
+  },
+  {
+    icon: IconStar,
+    title: 'Saved posts'
+  },
+  {
+    icon: IconMessage,
+    title: 'My Comments'
+  },
+  {
+    icon: IconFriends,
+    title: 'My Connections'
+  },
+  {
+    icon: IconSettings,
+    title: 'Account Settings'
+  },
+  {
+    icon: IconLogout,
+    title: 'Logout',
+    to: '/logout'
+  }
+];
+
 export function Header() {
   const navigate = useNavigate();
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
+  const [userLinksOpened, { toggle: toggleUserLinks }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
   const user = useUser();
   const isLoggedIn = user?.isLoggedIn ?? false;
@@ -110,8 +139,30 @@ export function Header() {
     </UnstyledButton>
   ));
 
+  const userLinks = userMenuData.map((item) => (
+    <UnstyledButton
+      className={classes.subLink}
+      key={item.title}
+      onClick={item?.to ? () => navigate(item.to) : () => null}
+    >
+      <Group wrap="nowrap" align="flex-start">
+        <ThemeIcon size={34} variant="default" radius="md">
+          <item.icon
+            style={{ width: rem(22), height: rem(22) }}
+            color={theme.colors.blue[6]}
+          />
+        </ThemeIcon>
+        <div>
+          <Text size="sm" fw={500}>
+            {item.title}
+          </Text>
+        </div>
+      </Group>
+    </UnstyledButton>
+  ));
+
   return (
-    <Box pb={20}>
+    <Box pb={10}>
       <header className={classes.header}>
         <Group justify="space-between" h="100%">
           <Anchor component={Link} to="/" underline="never">
@@ -315,7 +366,7 @@ export function Header() {
         onClose={closeDrawer}
         size="100%"
         padding="md"
-        title="Navigation"
+        title={site?.name ?? 'Site Name'}
         hiddenFrom="sm"
         zIndex={1000000}
       >
@@ -345,11 +396,30 @@ export function Header() {
           </a>
 
           <Divider my="sm" />
-
-          <Group justify="center" grow pb="xl" px="md">
-            <Button variant="default">Log in</Button>
-            <Button>Sign up</Button>
-          </Group>
+          {isLoggedIn ? (
+            <>
+              <UnstyledButton
+                className={classes.link}
+                onClick={toggleUserLinks}
+              >
+                <Center inline>
+                  <Box component="span" mr={5}>
+                    {username}
+                  </Box>
+                  <IconChevronDown
+                    style={{ width: rem(16), height: rem(16) }}
+                    color={theme.colors.blue[6]}
+                  />
+                </Center>
+              </UnstyledButton>
+              <Collapse in={userLinksOpened}>{userLinks}</Collapse>
+            </>
+          ) : (
+            <Group justify="center" grow pb="xl" px="md">
+              <Button variant="default">Log in</Button>
+              <Button>Sign up</Button>
+            </Group>
+          )}
         </ScrollArea>
       </Drawer>
     </Box>

@@ -1,9 +1,10 @@
+import { site } from '@/favor';
 import type { MetaFunction } from '@remix-run/node';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'New Remix App' },
-    { name: 'description', content: 'Welcome to Remix!' }
+    { title: `Home - ${site?.name ?? 'Site Name'}` },
+    { name: 'description', content: site?.description ?? 'Welcome to Remix!' }
   ];
 };
 
