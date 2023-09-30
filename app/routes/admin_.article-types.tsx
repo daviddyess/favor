@@ -30,38 +30,38 @@ export const ArticleTypes = () => {
   const rows = data?.articleTypes?.nodes ? (
     data?.articleTypes?.nodes?.map((articleType: ArticleType) => (
       <Fragment key={articleType?.name}>
-        <tr>
-          <td>{articleType?.id}</td>
-          <td>{articleType?.name}</td>
-          <td>{articleType?.title}</td>
-          <td>{articleType?.slug}</td>
-          <td>{articleType?.status}</td>
-          <td>
+        <Table.Tr>
+          <Table.Td>{articleType?.id}</Table.Td>
+          <Table.Td>{articleType?.name}</Table.Td>
+          <Table.Td>{articleType?.title}</Table.Td>
+          <Table.Td>{articleType?.slug}</Table.Td>
+          <Table.Td>{articleType?.status}</Table.Td>
+          <Table.Td>
             <Button
               onClick={() => setArticleTypeEditor(articleType?.id)}
               size="compact-xs"
             >
               Edit
             </Button>
-          </td>
-        </tr>
+          </Table.Td>
+        </Table.Tr>
         {articleTypeEditor === articleType?.id ? (
-          <tr key={`${articleType?.name}-editor`}>
-            <td colSpan={6}>
+          <Table.Tr key={`${articleType?.name}-editor`}>
+            <Table.Td colSpan={6}>
               <ArticleTypeEditor
                 {...articleType}
                 closeEditor={setArticleTypeEditor}
                 refetch={() => {}}
               />
-            </td>
-          </tr>
+            </Table.Td>
+          </Table.Tr>
         ) : null}
       </Fragment>
     ))
   ) : (
-    <tr>
-      <td colSpan={8}>No Articles Types Stored</td>
-    </tr>
+    <Table.Tr>
+      <Table.Td colSpan={8}>No Articles Types Stored</Table.Td>
+    </Table.Tr>
   );
 
   return (
@@ -86,17 +86,17 @@ export const ArticleTypes = () => {
           ) : null}
           <Card.Section p={10}>
             <Table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>TItle</th>
-                  <th>Slug</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>{rows}</tbody>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>ID</Table.Th>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th>TItle</Table.Th>
+                  <Table.Th>Slug</Table.Th>
+                  <Table.Th>Status</Table.Th>
+                  <Table.Th>Actions</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
             </Table>
           </Card.Section>
         </Card>

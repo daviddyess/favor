@@ -75,7 +75,7 @@ const ArticleEditor = ({
               </Alert>
             ) : null}
             <Form
-              method="post"
+              method="POST"
               action={route}
               onSubmit={form.onSubmit((_v, e) => submit(e.currentTarget))}
             >

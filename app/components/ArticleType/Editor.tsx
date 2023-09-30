@@ -10,9 +10,9 @@ import {
   TextInput
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { Form, useLoaderData, useSubmit } from '@remix-run/react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
-import type { ArticleTypeInput } from '~/interfaces/ArticleType';
 
 interface Editor {
   id?: string | null;
@@ -58,7 +58,13 @@ const ArticleTypeEditor = ({
   refetch = Function
 }: Editor) => {
   const [errorMsg] = useState({});
+  const { error } = useLoaderData();
 
+  const route = !id
+    ? '/admin/article-types/create'
+    : '/admin/article-types/update';
+
+  const submit = useSubmit();
   const form = useForm({
     initialValues: {
       id,
@@ -71,13 +77,6 @@ const ArticleTypeEditor = ({
       status
     }
   });
-
-  const handleArticleType = async (values: ArticleTypeInput) => {
-    // eslint-disable-next-line no-console
-    console.log(values);
-    refetch();
-    closeEditor(false);
-  };
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const autoFill = (name: string, value: string) => {
@@ -104,12 +103,16 @@ const ArticleTypeEditor = ({
           <Card.Section p={10}>Article Type Editor</Card.Section>
           <Card.Section p={10}>
             <pre>{JSON.stringify(errorMsg, null, 2)}</pre>
-            <form
-              onSubmit={form.onSubmit((values) => handleArticleType(values))}
+            <Form
+              method="POST"
+              action={route}
+              onSubmit={form.onSubmit((_v, e) => submit(e.currentTarget))}
             >
               <Stack>
+                {id && <input type="hidden" name="id" value={id} />}
                 <TextInput
                   label="Article Type Title"
+                  name="title"
                   type="text"
                   placeholder="e.g. Announcements"
                   {...form.getInputProps('title')}
@@ -119,7 +122,8 @@ const ArticleTypeEditor = ({
                 />
                 <TextInput
                   label="Unique Name"
-                  type="name"
+                  name="name"
+                  type="text"
                   placeholder="e.g. announcements"
                   {...form.getInputProps('name')}
                   onBlur={({ currentTarget: { value } }) =>
@@ -129,6 +133,7 @@ const ArticleTypeEditor = ({
                 <Textarea
                   placeholder="e.g. purpose, audience, .etc of articles"
                   label="Article Type Description"
+                  name="description"
                   {...form.getInputProps('description')}
                 />
                 <Switch
@@ -185,6 +190,7 @@ const ArticleTypeEditor = ({
                 />
                 <TextInput
                   label="URL Slug"
+                  name="slug"
                   type="text"
                   placeholder="article-type"
                   {...form.getInputProps('slug')}
@@ -238,6 +244,7 @@ const ArticleTypeEditor = ({
                 />
                 <Select
                   label="Article Type Status"
+                  name="status"
                   placeholder="Select Status"
                   {...form.getInputProps('status')}
                   data={[
@@ -252,12 +259,17 @@ const ArticleTypeEditor = ({
                     }
                   ]}
                 />
+                <input
+                  type="hidden"
+                  name="options"
+                  value={JSON.stringify(form.values.options)}
+                />
                 <Group align="center" mt="md">
                   <Button type="submit">Save</Button>
                   <Button onClick={() => closeEditor(false)}>Cancel</Button>
                 </Group>
               </Stack>
-            </form>
+            </Form>
           </Card.Section>
           <Card.Section>
             <pre>{JSON.stringify(form.values, null, 2)}</pre>

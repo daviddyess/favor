@@ -1,8 +1,66 @@
 import { aql, db } from '../modules/arango';
 import { getLogger } from 'logade';
+import type { ArticleTypeInput } from '~/interfaces/ArticleType';
+import { formatSlug, timeStamp } from '~/modules/utils';
 
 const log = getLogger('Users Query');
 const articleTypes = db.collection('articleTypes');
+
+export async function createArticleType({
+  description,
+  name,
+  options = {},
+  slug,
+  status,
+  title
+}: ArticleTypeInput) {
+  const articleType = await articleTypes.save(
+    {
+      createdAt: timeStamp(),
+      description,
+      name,
+      options,
+      status,
+      slug: formatSlug({ title: slug }),
+      title
+    },
+    {
+      returnNew: true
+    }
+  );
+
+  articleType.new.id = await articleType.new._key;
+
+  return articleType.new;
+}
+
+export async function updateArticleType({
+  id,
+  description,
+  name,
+  options = {},
+  slug,
+  status,
+  title
+}: ArticleTypeInput) {
+  const data = {
+    description,
+    name,
+    options,
+    slug: formatSlug({ title: slug }),
+    status,
+    title,
+    updatedAt: timeStamp()
+  };
+
+  const articleType = await articleTypes.update(id, data, {
+    returnNew: true
+  });
+
+  articleType.new.id = await articleType.new._key;
+
+  return articleType.new;
+}
 
 export async function getArticleType(id: string) {
   try {

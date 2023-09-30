@@ -36,43 +36,43 @@ export const ArticleList = () => {
   const rows = data?.articles?.nodes ? (
     data?.articles?.nodes?.map((article: Article) => (
       <Fragment key={article?.id}>
-        <tr>
-          <td>{article.id}</td>
-          <td>
+        <Table.Tr>
+          <Table.Td>{article.id}</Table.Td>
+          <Table.Td>
             {article?.articleType?.title} : {article?.articleTypeId}
-          </td>
-          <td>{article?.createdAt}</td>
-          <td>{article?.title}</td>
-          <td>{article?.slug}</td>
-          <td>{article?.status}</td>
-          <td>{article?.summary}</td>
-          <td>{article?.user?.username}</td>
-          <td>
+          </Table.Td>
+          <Table.Td>{article?.createdAt}</Table.Td>
+          <Table.Td>{article?.title}</Table.Td>
+          <Table.Td>{article?.slug}</Table.Td>
+          <Table.Td>{article?.status}</Table.Td>
+          <Table.Td>{article?.summary}</Table.Td>
+          <Table.Td>{article?.user?.username}</Table.Td>
+          <Table.Td>
             <Button
               onClick={() => setEditArticleId(article?.id)}
               size="compact-xs"
             >
               Edit
             </Button>
-          </td>
-        </tr>
+          </Table.Td>
+        </Table.Tr>
         {editArticleId === article?.id ? (
-          <tr key={`${article?.id}-editor`}>
-            <td colSpan={8}>
+          <Table.Tr key={`${article?.id}-editor`}>
+            <Table.Td colSpan={8}>
               <ArticleEditor
                 {...article}
                 closeEditor={setEditArticleId}
                 refetch={() => {}}
               />
-            </td>
-          </tr>
+            </Table.Td>
+          </Table.Tr>
         ) : null}
       </Fragment>
     ))
   ) : (
-    <tr>
-      <td colSpan={8}>No Articles Stored</td>
-    </tr>
+    <Table.Tr>
+      <Table.Td colSpan={8}>No Articles Stored</Table.Td>
+    </Table.Tr>
   );
 
   return (
@@ -102,20 +102,20 @@ export const ArticleList = () => {
           <Card.Section p={10}>Articles</Card.Section>
           <Card.Section p={10}>
             <Table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Article Type</th>
-                  <th>Created</th>
-                  <th>Title</th>
-                  <th>Slug</th>
-                  <th>Status</th>
-                  <th>Summary</th>
-                  <th>User</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>{rows}</tbody>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>ID</Table.Th>
+                  <Table.Th>Article Type</Table.Th>
+                  <Table.Th>Created</Table.Th>
+                  <Table.Th>Title</Table.Th>
+                  <Table.Th>Slug</Table.Th>
+                  <Table.Th>Status</Table.Th>
+                  <Table.Th>Summary</Table.Th>
+                  <Table.Th>User</Table.Th>
+                  <Table.Th>Actions</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
             </Table>
           </Card.Section>
         </Card>

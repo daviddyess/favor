@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { getLogger } from 'logade';
 import md5 from 'md5';
-import { sanitize } from '~/modules/stringSanitizer';
+import { sanitize } from 'string-sanitizer';
 
 const log = getLogger('Utils Module');
 /**
