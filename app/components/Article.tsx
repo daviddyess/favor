@@ -45,10 +45,10 @@ export default function ArticleCard({
 
   return (
     <Card withBorder mb={6} radius="md" className={classes.card}>
-      <Card.Section p={3}>
+      <Card.Section className={classes.header}>
         <Group justify="space-between">
           <Group gap={0} p={4}>
-            <Badge radius="md" size="md">
+            <Badge radius="md" size="md" variant="light">
               {category}
             </Badge>
           </Group>
@@ -67,37 +67,37 @@ export default function ArticleCard({
 
       {footer ? (
         <Group mt="xs">
-          <Text size="xs" color="dimmed">
+          <Text size="xs" c="dimmed">
             {footer}
           </Text>
         </Group>
       ) : null}
 
       <Card.Section className={classes.footer}>
-        <Group align="apart">
-          <Group gap={0}>
+        <Group justify="space-between">
+          <Group>
             <Avatar src={author.image} radius="sm" />
             <div>
               <Text size="sm" fw={500} pl={3}>
                 {author.name}
               </Text>
-              <Text size="xs" color="dimmed" pl={3}>
+              <Text size="xs" c="dimmed" pl={3}>
                 {author.description}
               </Text>
             </div>
           </Group>
-          <Group gap={0}>
-            <ActionIcon>
+          <Group>
+            <ActionIcon variant="subtle" color="gray">
               <IconHeart size={22} color={theme.colors.red[6]} stroke={1.5} />
             </ActionIcon>
-            <ActionIcon>
+            <ActionIcon variant="subtle" color="gray">
               <IconBookmark
                 size={22}
                 color={theme.colors.yellow[6]}
                 stroke={1.5}
               />
             </ActionIcon>
-            <ActionIcon>
+            <ActionIcon variant="subtle" color="gray">
               <IconShare size={22} color={theme.colors.blue[6]} stroke={1.5} />
             </ActionIcon>
           </Group>
