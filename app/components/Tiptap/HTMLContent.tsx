@@ -14,7 +14,7 @@ export default function HTMLContent({
   content: { type?: string; content?: JSONContent[] | undefined };
 }) {
   return (
-    <TypographyStylesProvider>
+    <TypographyStylesProvider pl={0} mb={0}>
       <div
         dangerouslySetInnerHTML={{
           __html: generateHTML(content, [
