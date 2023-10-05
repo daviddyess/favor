@@ -1,20 +1,22 @@
-import { dropCollection } from "../utils.mjs";
-import { getLogger } from "logade";
+import { dropCollection } from '../utils.mjs';
+import { getLogger } from 'logade';
 
 export default async function setup() {
-  const log = getLogger("0001");
+  const log = getLogger('0001');
 
-  log.info("Reverting");
+  log.info('Reverting');
 
   const documentCollections = [
-    "articles",
-    "articleTypes",
-    "privileges",
-    "roles",
-    "sessions",
-    "users",
+    'articles',
+    'articleTypes',
+    'blocks',
+    'blockGroups',
+    'blockTypes',
+    'privileges',
+    'roles',
+    'users'
   ];
-  const edgeCollections = ["hasAccess", "hasPrivilege", "hasRole"];
+  const edgeCollections = ['hasAccess', 'hasBlock', 'hasPrivilege', 'hasRole'];
 
   for (const localName of documentCollections) {
     await dropCollection({ name: localName });
