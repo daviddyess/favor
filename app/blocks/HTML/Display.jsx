@@ -1,5 +1,13 @@
-import HTMLContent from '~/components/Tiptap/HTMLContent';
+import { TypographyStylesProvider } from '@mantine/core';
 
 export const HTMLBlockContent = ({ content }) => {
-  return <HTMLContent content={content} />;
+  return (
+    <TypographyStylesProvider pl={0} mb={0}>
+      <div
+        dangerouslySetInnerHTML={{
+          __html: content
+        }}
+      />
+    </TypographyStylesProvider>
+  );
 };

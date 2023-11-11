@@ -1,32 +1,27 @@
 import {
-  Alert,
   Button,
   Card,
   Grid,
   Group,
   Select,
   Stack,
-  TextInput,
-  Title
+  TextInput
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import '@mantine/tiptap/styles.layer.css';
-import { Form, useSubmit } from '@remix-run/react';
+import { Form, useLoaderData, useSubmit } from '@remix-run/react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
-import type { BlockType } from '~/interfaces/BlockType';
+
 import { BlockEditors } from '~/blocks';
 
 interface Editor {
-  blockType?: BlockType;
   id?: string | null;
   name?: string;
   title?: string;
-  status?: string;
   content?: any;
-  closeEditor?: Dispatch<SetStateAction<string | null>>;
-  refetch?: Function;
-  stream?: { id: string; name: string };
+  status?: string;
+  closeEditor?: Dispatch<SetStateAction<string | null | boolean>>;
+  refetch: Function;
 }
 
 const getBlockContentEditor = ({
@@ -39,16 +34,9 @@ const getBlockContentEditor = ({
   form: any;
 }) => {
   switch (type) {
-    case 'html':
+    case 'HTML':
       return (
         <BlockEditors.HTMLBlockContentEditor content={content} form={form} />
-      );
-    case 'rich-text':
-      return (
-        <BlockEditors.RichTextBlockContentEditor
-          content={content}
-          form={form}
-        />
       );
     default:
       return null;
@@ -56,16 +44,34 @@ const getBlockContentEditor = ({
 };
 
 const BlockEditor = ({
-  blockType = { id: '', title: '', name: '' },
+  blockType,
   id = null,
   name = '',
   title = '',
-  status = '',
   content = '',
-  closeEditor = () => null,
-  refetch = () => null
+  status = '',
+  closeEditor = () => false,
+  refetch = Function
 }: Editor) => {
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg] = useState({});
+  const { error } = useLoaderData();
+
+  const route = !id ? '/admin/blocks/create' : '/admin/blocks/update';
+
+  const submit = useSubmit();
+  const form = useForm({
+    initialValues: {
+      id,
+      name,
+      title,
+      content,
+      status
+    }
+  });
+
+  const Content = () => getBlockContentEditor({ type, content, form });
+
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const autoFill = (name: string, value: string) => {
     switch (name) {
       case 'title':
@@ -76,38 +82,14 @@ const BlockEditor = ({
       default:
     }
   };
-  const route = !id ? '/admin/blocks/create' : '/admin/blocks/update';
-
-  const submit = useSubmit();
-  const form = useForm({
-    initialValues: {
-      blockTypeId: blockType.id,
-      id,
-      name,
-      title,
-      content,
-      status
-    }
-  });
-  const Content = getBlockContentEditor({
-    type: blockType.name,
-    content,
-    form
-  });
 
   return (
     <Grid>
-      <Grid.Col span={{ base: 12, md: 6 }}>
+      <Grid.Col span={{ base: 12, md: 6, lg: 4, xl: 4 }}>
         <Card withBorder>
+          <Card.Section p={10}>Block Editor</Card.Section>
           <Card.Section p={10}>
-            <Title order={3}>{blockType?.title} Editor</Title>
-          </Card.Section>
-          <Card.Section p={10}>
-            {errorMsg ? (
-              <Alert title="Error" color="red">
-                {errorMsg}
-              </Alert>
-            ) : null}
+            <pre>{JSON.stringify(errorMsg, null, 2)}</pre>
             <Form
               method="POST"
               action={route}
@@ -115,13 +97,15 @@ const BlockEditor = ({
             >
               <Stack>
                 {id && <input type="hidden" name="id" value={id} />}
-                <input type="hidden" name="blockTypeId" value={blockType.id} />
                 <TextInput
                   label="Block Title"
                   name="title"
                   type="text"
-                  placeholder="Title"
+                  placeholder="e.g. Announcements"
                   {...form.getInputProps('title')}
+                  onBlur={({ currentTarget: { value } }) =>
+                    autoFill('title', value)
+                  }
                 />
                 <TextInput
                   label="Unique Name"
@@ -133,7 +117,7 @@ const BlockEditor = ({
                     autoFill('name', value)
                   }
                 />
-                {Content}
+                {Content && <Content />}
                 <Select
                   label="Block Status"
                   name="status"
@@ -151,12 +135,15 @@ const BlockEditor = ({
                     }
                   ]}
                 />
+                <Group align="center" mt="md">
+                  <Button type="submit">Save</Button>
+                  <Button onClick={() => closeEditor(false)}>Cancel</Button>
+                </Group>
               </Stack>
-              <Group align="center" mt="md">
-                <Button type="submit">Save</Button>
-                <Button onClick={() => closeEditor('')}>Cancel</Button>
-              </Group>
             </Form>
+          </Card.Section>
+          <Card.Section>
+            <pre>{JSON.stringify(form.values, null, 2)}</pre>
           </Card.Section>
         </Card>
       </Grid.Col>

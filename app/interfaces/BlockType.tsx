@@ -1,17 +1,17 @@
 import type { DocumentSelector } from 'arangojs/documents';
 
-export type BlockGroupInput = {
+export type BlockTypeInput = {
   id?: DocumentSelector | string | null;
   name: string;
   title: string;
   description: string;
-  status: string;
+  options?: any;
 };
 
-export type BlockGroup = {
+export type BlockType = {
   id: string;
   name: string;
-  title?: string;
-  description?: string;
-  status: string;
+  options?: any;
+  title: string;
+  description: string;
 };

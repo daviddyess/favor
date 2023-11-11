@@ -1,15 +1,21 @@
-import { HTMLBlockContentEditor } from '~/blocks/HTML/Create';
+import { HTMLBlockContentEditor } from '~/blocks/HTML/Editor';
 import { HTMLBlockContent } from '~/blocks/HTML/Display';
+import { RichTextBlockContentEditor } from '~/blocks/RichText/Editor';
+import { RichTextBlockContent } from '~/blocks/RichText/Display';
 
 export const BlockEditors = {
-  HTMLBlockContentEditor
+  HTMLBlockContentEditor,
+  RichTextBlockContentEditor
 };
 
 export const BlockContents = {
-  HTMLBlockContent
+  HTMLBlockContent,
+  RichTextBlockContent
 };
 
 export default {
   HTMLBlockContentEditor,
-  HTMLBlockContent
+  HTMLBlockContent,
+  RichTextBlockContentEditor,
+  RichTextBlockContent
 };
