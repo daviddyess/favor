@@ -6,12 +6,17 @@ export default async function setup() {
 
   log.info('Migrating');
 
+  const date = new Date(Date.now());
+
+  const timeStamp = date.toISOString();
+
   const documentCollections = [
     'articles',
     'articleTypes',
     'blocks',
     'blockGroups',
     'blockTypes',
+    'comments',
     'privileges',
     'roles',
     'users'
@@ -25,6 +30,65 @@ export default async function setup() {
   for (const localName of edgeCollections) {
     await createEdgeCollection({ name: localName });
   }
+
+  /**
+   * articles types
+   */
+  const articleTypes = await db.collection('articleTypes');
+
+  await articleTypes.ensureIndex({
+    type: 'persistent',
+    name: 'slug',
+    unique: false,
+    fields: ['slug']
+  });
+  await articleTypes.ensureIndex({
+    type: 'persistent',
+    name: 'name',
+    unique: false,
+    fields: ['name']
+  });
+  await articleTypes.ensureIndex({
+    type: 'persistent',
+    name: 'createdAt',
+    unique: true,
+    fields: ['createdAt']
+  });
+  await articleTypes.ensureIndex({
+    type: 'persistent',
+    name: 'status',
+    unique: false,
+    fields: ['status']
+  });
+  await articleTypes.ensureIndex({
+    type: 'persistent',
+    name: 'siteId',
+    unique: false,
+    fields: ['siteId']
+  });
+
+  /**
+   * Import Article Types
+   */
+  await articleTypes.import([
+    {
+      createdAt: timeStamp,
+      description: 'Blog',
+      name: 'blog',
+      options: {
+        slugFormat: 'date-title',
+        usePublishedDate: true,
+        useSetDateAndTime: true,
+        useStatus: true,
+        useSummary: false,
+        useSummaryAsIntro: false,
+        useImage: false
+      },
+      status: 'enabled',
+      slug: 'blog',
+      title: 'Blog'
+    }
+  ]);
 
   /**
    * articles
@@ -69,42 +133,6 @@ export default async function setup() {
   });
 
   /**
-   * articles types
-   */
-  const articleTypes = await db.collection('articleTypes');
-
-  await articleTypes.ensureIndex({
-    type: 'persistent',
-    name: 'slug',
-    unique: false,
-    fields: ['slug']
-  });
-  await articleTypes.ensureIndex({
-    type: 'persistent',
-    name: 'name',
-    unique: false,
-    fields: ['name']
-  });
-  await articleTypes.ensureIndex({
-    type: 'persistent',
-    name: 'createdAt',
-    unique: true,
-    fields: ['createdAt']
-  });
-  await articleTypes.ensureIndex({
-    type: 'persistent',
-    name: 'status',
-    unique: false,
-    fields: ['status']
-  });
-  await articleTypes.ensureIndex({
-    type: 'persistent',
-    name: 'siteId',
-    unique: false,
-    fields: ['siteId']
-  });
-
-  /**
    * Blocks
    */
   const blocks = await db.collection('blocks');
@@ -136,6 +164,18 @@ export default async function setup() {
   });
 
   /**
+   * Import Block Groups
+   */
+  await blockGroups.import([
+    {
+      description: 'Default Left Blocks Group',
+      name: 'left',
+      status: 'enabled',
+      title: 'Left'
+    }
+  ]);
+
+  /**
    * Block Types
    */
   const blockTypes = await db.collection('blockTypes');
@@ -145,6 +185,90 @@ export default async function setup() {
     name: 'name',
     unique: false,
     fields: ['name']
+  });
+
+  /**
+   * Import Block Types
+   */
+  await blockTypes.import([
+    {
+      name: 'html',
+      title: 'HTML',
+      description: 'Custom HTML content block',
+      options: {}
+    },
+    {
+      name: 'menu',
+      title: 'Menu',
+      description: 'Menu block',
+      options: {}
+    },
+    {
+      name: 'navbar',
+      title: 'Navigation Bar',
+      description: 'Horizontal Menu',
+      options: {}
+    },
+    {
+      name: 'rich-text',
+      title: 'Rich Text',
+      description: 'Content block using the Tiptap rich text editor',
+      options: {}
+    }
+  ]);
+
+  /**
+   * comments
+   */
+  const comments = await db.collection('comments');
+
+  await comments.ensureIndex({
+    type: 'persistent',
+    name: 'articleTypeId',
+    unique: false,
+    fields: ['articleTypeId']
+  });
+  await comments.ensureIndex({
+    type: 'persistent',
+    name: 'articleId',
+    unique: false,
+    fields: ['articleId']
+  });
+  await comments.ensureIndex({
+    type: 'persistent',
+    name: 'createdAt',
+    unique: false,
+    fields: ['createdAt']
+  });
+  await comments.ensureIndex({
+    type: 'persistent',
+    name: 'parentId',
+    unique: false,
+    fields: ['parentId']
+  });
+  await comments.ensureIndex({
+    type: 'persistent',
+    name: 'path',
+    unique: false,
+    fields: ['path']
+  });
+  await comments.ensureIndex({
+    type: 'persistent',
+    name: 'status',
+    unique: false,
+    fields: ['status']
+  });
+  await comments.ensureIndex({
+    type: 'persistent',
+    name: 'updatedAt',
+    unique: false,
+    fields: ['updatedAt']
+  });
+  await comments.ensureIndex({
+    type: 'persistent',
+    name: 'userId',
+    unique: false,
+    fields: ['userId']
   });
 
   /**

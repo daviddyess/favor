@@ -12,6 +12,7 @@ export default async function setup() {
     'blocks',
     'blockGroups',
     'blockTypes',
+    'comments',
     'privileges',
     'roles',
     'users'

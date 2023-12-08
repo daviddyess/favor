@@ -2,7 +2,7 @@ import { aql, db } from '~/modules/arango';
 import { getLogger } from 'logade';
 import type { CommentInput } from '~/interfaces/Comment';
 import { getArticleType } from './articleType.server';
-import { formatSlug, timeStamp } from '~/modules/utils';
+import { timeStamp } from '~/modules/utils';
 
 const log = getLogger('Users Query');
 const articles = db.collection('articles');
@@ -12,78 +12,25 @@ const users = db.collection('users');
 
 export async function createComment({
   articleTypeId,
-  createdAt = null,
-  status = 'draft',
-  summary,
   text,
   title,
-  images = [],
   userId
 }: CommentInput) {
   try {
-    const {
-      options: {
-        slugFormat,
-        usePublishedDate,
-        useSetDateAndTime,
-        useStatus,
-        useSummary
-      },
-      title: articleTypeTitle
-    } = await getArticleType(articleTypeId);
+    const { title: articleTypeTitle } = await getArticleType(articleTypeId);
 
     const data = {
       articleTypeId,
       text,
       title,
-      createdAt:
-        useSetDateAndTime && createdAt !== null ? createdAt : timeStamp(),
+      createdAt: timeStamp(),
       userId
     };
 
-    if (useStatus) {
-      data.status = status;
-    }
-    if (useSummary) {
-      data.summary = summary;
-    }
-
-    const article = await articles.save(data, {
+    const article = await comments.save(data, {
       returnNew: true
     });
 
-    const slug = formatSlug({
-      format: slugFormat,
-      id: article._key,
-      title
-    });
-    const _images: {
-      base64?: string;
-      description?: string;
-      file?: string;
-      name?: string;
-    }[] = [];
-
-    if (images.length > 0) {
-      images?.map(async (file) => {
-        if (file?.base64) {
-          file.name = `${article._key}_${Date.now()}.webp`;
-          // file.deleteFile = data?.avatar;
-          await processImage({ file });
-          _images.push({
-            file: file?.name,
-            description: file?.description
-          });
-        }
-      });
-    }
-
-    await articles.update(article._key, {
-      slug,
-      images: _images
-    });
-
-    article.new.slug = slug;
     article.new.articleType = { title: articleTypeTitle };
 
     return article.new;
@@ -100,50 +47,18 @@ export async function updateComment({
   status = 'draft',
   text,
   title,
-  images = [],
   userId
 }: CommentInput) {
   try {
-    const {
-      options: {
-        slugFormat,
-        usePublishedDate,
-        useSetDateAndTime,
-        useStatus,
-        useSummary
-      },
-      title: articleTypeTitle
-    } = await getArticleType(articleTypeId);
-    const articleQuery = await db.query(aql`
-          FOR article IN ${articles}
-            FILTER article._key == ${id}
-            LIMIT 1
-            RETURN article.status
-        `);
+    const { title: articleTypeTitle } = await getArticleType(articleTypeId);
 
-    const prevStatus = await articleQuery.next();
-    const data = { status, summary, text, title, updatedAt: timeStamp() };
+    const data = { status, text, title, updatedAt: timeStamp() };
 
-    if (
-      usePublishedDate &&
-      prevStatus !== 'published' &&
-      status === 'published'
-    ) {
-      data.createdAt = timeStamp();
-      data.slug = formatSlug({ format: slugFormat, id, title });
-    }
-    if (useStatus) {
-      data.status = status;
-    }
-    if (useSummary) {
-      data.summary = summary;
-    }
-
-    const article = await articles.update(id, data, {
+    const comment = await comments.update(id, data, {
       returnNew: true
     });
-
-    return article.new;
+    comment.new.articleType = { title: articleTypeTitle };
+    return comment.new;
   } catch (error: any) {
     log.error(error.message);
     log.error(error.stack);
@@ -154,14 +69,22 @@ export async function updateComment({
 export async function getComments({
   filter = {}
 }: {
-  filter?: { username?: string; stream?: string };
+  filter?: {
+    username?: string;
+    articleId?: string;
+    article?: string;
+    articleTypeId?: string;
+  };
 }) {
   try {
-    let user,
-      stream,
-      userFilter = '',
-      streamFilter = '';
-    const bindVars = {} as { userId?: string; streamId?: string };
+    let article,
+      user,
+      articleFilter,
+      userFilter = '';
+    const bindVars = {} as {
+      articleId?: string;
+      userId?: string;
+    };
 
     if (filter?.username) {
       const userQuery = await db.query(
@@ -176,60 +99,54 @@ export async function getComments({
       );
 
       user = await userQuery.next();
-      userFilter = `FILTER article.userId == @userId`;
+      userFilter = `FILTER comment.userId == @userId`;
       bindVars.userId = user.id;
     }
-    if (filter?.stream) {
-      const streamSlug = filter?.username
-        ? `${user.id}/${filter.stream}`
-        : filter?.stream;
-      const streamQuery = await db.query(
+    if (filter?.article) {
+      const articleQuery = await db.query(
         aql`
-            FOR stream IN ${streams}
-              FILTER stream.slug == ${streamSlug}
+            FOR article IN ${articles}
+              FILTER atricle.slug == ${filter.article}
               LIMIT 1
               RETURN {
-                "id" : stream._key
+                "id" : article._key
               }
           `
       );
 
-      stream = await streamQuery.next();
-      streamFilter = `FILTER article.streamId == @streamId`;
-      bindVars.streamId = stream.id;
+      article = await articleQuery.next();
+      articleFilter = `FILTER comment.articleId == @articleId`;
+      bindVars.articleId = article.id;
+    }
+    if (filter?.articleId) {
+      articleFilter = `FILTER comment.articleId == @articleId`;
+      bindVars.articleId = filter.articleId;
     }
 
-    const article = await db.query(
+    const comment = await db.query(
       {
-        query: `FOR article IN articles
+        query: `FOR comment IN comments
+          ${articleFilter}
           ${userFilter}
-          ${streamFilter}
-          FOR articleType in articleTypes
-            FILTER articleType._key == article.articleTypeId
           FOR user IN users
-            FILTER user._key == article.userId
-          SORT article.createdAt DESC
+            FILTER user._key == comment.userId
+          SORT comment.createdAt DESC
           RETURN {
-            "id" : article._key,
-            "articleType" : MERGE(articleType, {"id": articleType._key}),
-            "articleTypeId" : article.articleTypeId,
-            "createdAt" : article.createdAt,
-            "slug" : article.slug,
-            "summary" : article.summary,
-            "status" : article.status,
-            "text" : article.text,
-            "title" : article.title,
-            "updatedAt" : article.updatedAt,
+            "id" : comment._key,
+            "articleId" : comment.articleId,
+            "createdAt" : comment.createdAt,
+            "text" : comment.text,
+            "updatedAt" : comment.updatedAt,
             "user" : user,
-            "userId" : article.userId
+            "userId" : comment.userId
           }`,
         bindVars
       },
       { fullCount: true }
     );
 
-    const totalCount = await article?.extra?.stats?.fullCount;
-    const nodes = await article.all();
+    const totalCount = await comment?.extra?.stats?.fullCount;
+    const nodes = await comment.all();
     console.log(nodes);
     return {
       count: nodes.length,
