@@ -11,7 +11,7 @@ import {
   Title
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import '@mantine/tiptap/styles.css';
+import '@mantine/tiptap/styles.layer.css';
 import { Form, useSubmit } from '@remix-run/react';
 import type { JSONContent } from '@tiptap/core';
 import type { Dispatch, SetStateAction } from 'react';

@@ -1,6 +1,6 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
-import '@mantine/core/styles.css';
+import '@mantine/core/styles.layer.css';
 import { cssBundleHref } from '@remix-run/css-bundle';
 import {
   json,

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { ThemeContext } from '~/hooks/useTheme';
 import { theme as defaultTheme } from '~/modules/config.server';
-import { Theme } from '@/favor';
+import { Theme, Pages } from '@/favor';
 
-export function ThemeProvider({ children }) {
+export function ThemeProvider({ children, defaultPage = 'Page' }) {
   const [theme, setTheme] = useState(defaultTheme);
-  const [page, setPage] = useState('Page');
-  const Page = Theme[page];
+  const [page, setPage] = useState(defaultPage);
+  const Page =
+    page !== defaultPage ? Theme[page] : Theme[Pages?.root ?? defaultPage];
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, page, setPage }}>
